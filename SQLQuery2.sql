@@ -1,3 +1,5 @@
+use GD2C2020;
+
 --Clientes
 CREATE TABLE Cliente (
 	cliente_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -25,7 +27,7 @@ ORDER BY dni
 
 --Fabricante
 create table Fabricante (
-	id INT IDENTITY(1,1) PRIMARY KEY,
+	fabricante_id INT IDENTITY(1,1) PRIMARY KEY,
 	fabricante_nombre VARCHAR(255) NOT NULL
 )
 
@@ -39,7 +41,6 @@ create table Tipo_Caja (
 )
 
 insert into Tipo_Caja (caja_desc) values ('No especificado');
-select * from Tipo_Caja;
 SET IDENTITY_INSERT Tipo_Caja ON;
 
 insert into Tipo_Caja (caja_id, caja_desc)
@@ -104,7 +105,7 @@ SET IDENTITY_INSERT Modelo ON;
 insert into Modelo (modelo_id, modelo_nombre, modelo_potencia, tipo_motor_codigo, cod_fabricante, cod_caja, cod_auto, cod_transmision)
 select distinct ma.MODELO_CODIGO modelo_id, ma.MODELO_NOMBRE modelo_nombre,
 	ma.MODELO_POTENCIA modelo_potencia, ma.TIPO_MOTOR_CODIGO tipo_motor_codigo,
-	fa.id cod_fabricante, ma.TIPO_CAJA_CODIGO cod_caja,
+	fa.fabricante_id cod_fabricante, ma.TIPO_CAJA_CODIGO cod_caja,
 	ma.TIPO_AUTO_CODIGO cod_auto, ma.TIPO_TRANSMISION_CODIGO cod_transmision
 from gd_esquema.Maestra ma 
 	join Fabricante fa on ma.FABRICANTE_NOMBRE = fa.fabricante_nombre
@@ -182,7 +183,7 @@ create table Compra_Autoparte (
 	fecha DATE NOT NULL,
 	cliente_id INT NOT NULL,
 	sucursal_id INT NOT NULL,
-	FOREIGN KEY (cliente_id) REFERENCES gd_esquema.Cliente,
+	FOREIGN KEY (cliente_id) REFERENCES Cliente,
 	FOREIGN KEY (sucursal_id) REFERENCES Sucursal
 	);
 
@@ -198,9 +199,9 @@ create table Compra_Autoparte_Item (
 
 SET IDENTITY_INSERT Compra_Autoparte ON
 insert into Compra_Autoparte (nro_compra, fecha, cliente_id, sucursal_id)
-select distinct COMPRA_NRO nro_compra, COMPRA_FECHA fecha, cl.id cliente_id, su.sucursal_id
+select distinct COMPRA_NRO nro_compra, COMPRA_FECHA fecha, cl.cliente_id cliente_id, su.sucursal_id
 from gd_esquema.Maestra	ma
-	join gd_esquema.Cliente cl on ma.CLIENTE_NOMBRE = cl.nombre and ma.CLIENTE_APELLIDO = cl.apellido and ma.CLIENTE_DNI = cl.dni
+	join Cliente cl on ma.CLIENTE_NOMBRE = cl.nombre and ma.CLIENTE_APELLIDO = cl.apellido and ma.CLIENTE_DNI = cl.dni
 	join Sucursal su on ma.SUCURSAL_CIUDAD = su.ciudad and ma.SUCURSAL_DIRECCION = su.direccion
 where COMPRA_NRO is not null and AUTO_PARTE_CODIGO is not null;
 SET IDENTITY_INSERT Compra_Autoparte OFF
