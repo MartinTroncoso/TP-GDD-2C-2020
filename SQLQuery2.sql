@@ -348,3 +348,5 @@ drop table VARCHARIZARD.factura_autoparte_cliente_temp;
 GO
 
 EXEC [VARCHARIZARD].[creacion_de_tablas]
+
+--DROP PROCEDURE [VARCHARIZARD].[creacion_de_tablas]
