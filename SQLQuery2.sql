@@ -1,6 +1,8 @@
 use GD2C2020;
+GO
 
-CREATE schema VARCHARIZARD
+CREATE schema VARCHARIZARD;
+GO
 
 CREATE PROCEDURE [VARCHARIZARD].[creacion_de_tablas]
 AS
@@ -347,4 +349,8 @@ drop table VARCHARIZARD.factura_autoparte_cliente_temp;
 
 GO
 
-EXEC [VARCHARIZARD].[creacion_de_tablas]
+EXEC [VARCHARIZARD].[creacion_de_tablas];
+GO
+
+DROP PROCEDURE [VARCHARIZARD].[creacion_de_tablas];
+GO
