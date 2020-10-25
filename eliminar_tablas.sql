@@ -1,3 +1,6 @@
+use GD2C2020;
+GO
+
 drop table VARCHARIZARD.Factura_Autoparte_Item;
 drop table VARCHARIZARD.Factura_Autoparte;
 
@@ -21,3 +24,4 @@ drop table VARCHARIZARD.Cliente;
 
 drop procedure [VARCHARIZARD].[creacion_de_tablas];
 drop schema VARCHARIZARD;
+GO
