@@ -204,7 +204,7 @@ from gd_esquema.Maestra	ma
 	join Cliente cl on ma.CLIENTE_NOMBRE = cl.nombre and ma.CLIENTE_APELLIDO = cl.apellido and ma.CLIENTE_DNI = cl.dni
 	join Sucursal su on ma.SUCURSAL_CIUDAD = su.ciudad and ma.SUCURSAL_DIRECCION = su.direccion
 where COMPRA_NRO is not null and AUTO_PARTE_CODIGO is not null;
-SET IDENTITY_INSERT Compra_Autoparte OFF
+SET IDENTITY_INSERT Compra_Autoparte OFF;
 
 insert into Compra_Autoparte_Item (compra_id, autoparte_id, precio, cantidad)
 select distinct COMPRA_NRO, AUTO_PARTE_CODIGO, COMPRA_PRECIO, COMPRA_CANT
@@ -212,3 +212,65 @@ from gd_esquema.Maestra
 where AUTO_PARTE_CODIGO is not null and COMPRA_NRO is not null
 ORDER BY COMPRA_NRO;
 
+
+-- factura automovil
+CREATE TABLE Factura_Automovil (
+	factura_nro BIGINT IDENTITY(1,1) PRIMARY KEY,
+	factura_fecha DATE NOT NULL,
+	factura_precio DECIMAL(18,2) NOT NULL,
+	automovil_id BIGINT NOT NULL,
+	sucursal_id INT NOT NULL,
+	cliente_id INT NOT NULL,
+	FOREIGN KEY (automovil_id) REFERENCES automovil,
+	FOREIGN KEY (sucursal_id) REFERENCES Sucursal,
+	FOREIGN KEY (cliente_id) REFERENCES Cliente
+);
+
+
+--temp factura autmovil
+create table factura_automovil_temp (
+	factura_nro BIGINT,
+	automovil_id BIGINT
+);
+insert into factura_automovil_temp (factura_nro, automovil_id)
+select ma.FACTURA_NRO factura_nro, au.automovil_id automovil_id
+from gd_esquema.Maestra ma
+join automovil au on ma.AUTO_PATENTE = au.patente
+where ma.FACTURA_NRO IS NOT NULL AND ma.AUTO_PATENTE IS NOT NULL;
+
+-- temp factura sucursal
+create table factura_sucursal_temp (
+	factura_nro BIGINT,
+	sucursal_id INT
+);
+insert into factura_sucursal_temp (factura_nro, sucursal_id)
+select ma.FACTURA_NRO factura_nro, su.sucursal_id sucursal_id
+from gd_esquema.Maestra ma
+join Sucursal su on ma.FAC_SUCURSAL_CIUDAD = su.ciudad AND MA.FAC_SUCURSAL_DIRECCION = su.direccion
+where ma.FACTURA_NRO IS NOT NULL AND ma.AUTO_PATENTE IS NOT NULL;
+
+-- factura cliente temp
+create table factura_cliente_temp (
+	factura_nro BIGINT,
+	cliente_id INT
+);
+insert into factura_cliente_temp (factura_nro, cliente_id)
+select ma.FACTURA_NRO factura_nro, cl.cliente_id cliente_id
+from gd_esquema.Maestra ma
+join Cliente cl on ma.CLIENTE_DNI = cl.dni and ma.CLIENTE_APELLIDO = cl.apellido and ma.CLIENTE_NOMBRE = cl.nombre
+where ma.FACTURA_NRO IS NOT NULL AND ma.AUTO_PATENTE IS NOT NULL;
+
+SET IDENTITY_INSERT Factura_Automovil ON;
+insert into Factura_Automovil (factura_nro, factura_fecha, factura_precio, automovil_id, sucursal_id, cliente_id)
+select ma.FACTURA_NRO factura_nro, ma.FACTURA_FECHA factura_fecha, ma.PRECIO_FACTURADO factura_precio, au.automovil_id automovil_id, su.sucursal_id sucursal_id, cl.cliente_id cliente_id
+from gd_esquema.Maestra ma
+join factura_automovil_temp au on ma.FACTURA_NRO = au.factura_nro
+join factura_sucursal_temp su on ma.FACTURA_NRO = su.factura_nro
+join factura_cliente_temp cl on ma.FACTURA_NRO = cl.factura_nro
+where ma.FACTURA_NRO IS NOT NULL AND ma.AUTO_PATENTE IS NOT NULL;
+
+SET IDENTITY_INSERT Factura_Automovil OFF;
+
+drop table factura_automovil_temp;
+drop table factura_cliente_temp;
+drop table factura_sucursal_temp;
