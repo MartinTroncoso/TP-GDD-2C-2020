@@ -15,6 +15,22 @@ create table varcharizard.BI_venta_automovil (
 	factura_precio decimal(18,2),
 )
 
+create table varcharizard.BI_venta_autoparte(
+	autoparte_id bigint foreign key references varcharizard.BI_autoparte,
+	cliente_id int foreign key references varcharizard.BI_cliente,
+	fecha date foreign key references varcharizard.BI_tiempo,
+	sucursal_id int foreign key references varcharizard.BI_sucursal,
+	modelo_id int foreign key references varcharizard.BI_modelo,
+	fabricante_id int foreign key references varcharizard.BI_fabricante,
+	tipo_automovil_id int foreign key references varcharizard.BI_tipo_automovil,
+	tipo_caja_id int foreign key references varcharizard.BI_tipo_caja,
+	tipo_motor int foreign key references varcharizard.BI_tipo_motor,
+	tipo_transmision int foreign key references varcharizard.BI_tipo_transmision,
+	id_potencia int foreign key references varcharizard.BI_potencia,
+	factura_precio decimal(18,2)
+)
+
+
 create function varcharizard.rango_potencia (@potencia int) returns int as
 begin
 	if @potencia < 50 begin return 0 end
