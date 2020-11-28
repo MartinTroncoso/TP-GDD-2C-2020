@@ -80,4 +80,11 @@ insert into varcharizard.BI_potencia values (1, '50-150cv');
 insert into varcharizard.BI_potencia values (2, '151-300cv');
 insert into varcharizard.BI_potencia values (3, '>300cv');
 
-----
+-- dimension autoparte
+
+create table varcharizard.BI_autoparte (
+	id_autoparte int primary key,
+	descripcion varchar(255)
+)
+insert into VARCHARIZARD.BI_autoparte
+select autoparte_id, autoparte_descripcion from VARCHARIZARD.Autoparte;
