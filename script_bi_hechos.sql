@@ -1,5 +1,6 @@
 use GD2C2020;
 
+-- venta automovil
 create table varcharizard.BI_venta_automovil (
 	cliente_id int foreign key references varcharizard.BI_cliente,
 	fecha date foreign key references varcharizard.BI_tiempo,
@@ -13,7 +14,6 @@ create table varcharizard.BI_venta_automovil (
 	id_potencia int foreign key references varcharizard.BI_potencia,
 	factura_precio decimal(18,2),
 )
-
 
 create function varcharizard.rango_potencia (@potencia int) returns int as
 begin
@@ -31,5 +31,30 @@ select fac.cliente_id, fac.factura_fecha, fac.sucursal_id, a.cod_modelo, m.cod_f
 		fac.factura_precio
 from VARCHARIZARD.Factura_Automovil fac
  join VARCHARIZARD.automovil a on fac.automovil_id = a.automovil_id
+ join VARCHARIZARD.Modelo m on a.cod_modelo = m.modelo_id
+;
+
+-- compra automovil
+create table varcharizard.BI_compra_automovil (
+	cliente_id int foreign key references varcharizard.BI_cliente,
+	fecha date foreign key references varcharizard.BI_tiempo,
+	sucursal_id int foreign key references varcharizard.BI_sucursal,
+	modelo_id int foreign key references varcharizard.BI_modelo,
+	fabricante_id int foreign key references varcharizard.BI_fabricante,
+	tipo_automovil_id int foreign key references varcharizard.BI_tipo_automovil,
+	tipo_caja_id int foreign key references varcharizard.BI_tipo_caja,
+	tipo_motor int foreign key references varcharizard.BI_tipo_motor,
+	tipo_transmision int foreign key references varcharizard.BI_tipo_transmision,
+	id_potencia int foreign key references varcharizard.BI_potencia,
+	compra_precio decimal(18,2),
+);
+
+insert into varcharizard.BI_compra_automovil
+select comp.cliente_id, comp.fecha, comp.sucursal_id, a.cod_modelo, m.cod_fabricante,
+		m.cod_auto, m.cod_caja, m.tipo_motor_codigo, m.cod_transmision,
+		varcharizard.rango_potencia(m.modelo_potencia) potencia_id,
+		comp.precio
+from VARCHARIZARD.Compra_Automovil comp
+ join VARCHARIZARD.automovil a on comp.automovil_id = a.automovil_id
  join VARCHARIZARD.Modelo m on a.cod_modelo = m.modelo_id
 ;
