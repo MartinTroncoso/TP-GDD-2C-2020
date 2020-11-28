@@ -15,7 +15,14 @@ create table varcharizard.BI_tiempo (
 	anio int not null
 )
 insert into VARCHARIZARD.BI_tiempo
-select distinct fecha, month(fecha), year(fecha) from VARCHARIZARD.Compra_Automovil;
+select distinct fecha, month(fecha), year(fecha) from VARCHARIZARD.Compra_Automovil
+union
+select distinct factura_fecha, month(factura_fecha), year(factura_fecha) from VARCHARIZARD.Factura_Automovil
+union
+select distinct fecha, month(fecha), year(fecha) from VARCHARIZARD.Compra_Autoparte
+union
+select distinct fecha, month(fecha), year(fecha) from VARCHARIZARD.Factura_Autoparte
+;
 
 -- DIMENSION SUCURSAL
 create table varcharizard.BI_sucursal (
