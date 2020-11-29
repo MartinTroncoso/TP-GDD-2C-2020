@@ -1,24 +1,45 @@
 use GD2C2020;
 
-CREATE VIEW precioPromedioAutoparte
-AS SELECT SUM(precio)/SUM(comp.cantidad) promedioCompra, SUM(precio_facturado)/SUM(fact.cantidad)	promedioVenta
-   FROM VARCHARIZARD.Compra_Autoparte_Item comp JOIN VARCHARIZARD.Factura_Autoparte_Item fact ON comp.autoparte_id = fact.autoparte_id ;
+create proc varcharizard.creacion_vistas as
 
-CREATE VIEW ganaciasSucursalPorMes
-AS SELECT sucursal_id, SUM(precio_facturado - precio) ganancia, YEAR(fac2.fecha) anio, MONTH(fac2.fecha) mes
-FROM VARCHARIZARD.Factura_Autoparte_Item fac1 JOIN VARCHARIZARD.Compra_Autoparte_Item com ON fac1.autoparte_id = com.autoparte_id
-											  JOIN VARCHARIZARD.Factura_Autoparte fac2 ON fac1.factura_nro = fac2.factura_nro
-GROUP BY  sucursal_id,YEAR(fac2.fecha), MONTH(fac2.fecha)
-ORDER BY 3,4,1;
+-----------------------------------
+-- Vistas autoparte
+-----------------------------------
+go
+create view VARCHARIZARD.precioPromedioAutoparte as
+select aut.id_autoparte autoparte_id, aut.descripcion autoparte_descripcion,
+( select sum(compra_precio*cantidad)/sum(cantidad) from VARCHARIZARD.BI_compra_autoparte compra where compra.autoparte_id = aut.id_autoparte) promedio_compra, 
+( select sum(factura_precio*cantidad)/sum(cantidad) from VARCHARIZARD.BI_venta_autoparte venta where venta.autoparte_id = aut.id_autoparte) promedio_venta
+from VARCHARIZARD.BI_autoparte aut
+;
 
-CREATE VIEW maximaCantidadStockPorSucursal 
-AS SELECT sucursal_id, MAX(cantidad) maximaCantidadStock,YEAR(factura.fecha) anio
-   FROM VARCHARIZARD.Factura_Autoparte_Item facturaItem JOIN VARCHARIZARD.Factura_Autoparte factura ON facturaItem.factura_nro = factura.factura_nro
-   GROUP BY sucursal_id,YEAR(factura.fecha);
-   
+go
+create view VARCHARIZARD.ganaciasSucursalPorMes as
+select distinct suc.descripcion sucursal, t.mes,
+(select sum(factura_precio*cantidad) from VARCHARIZARD.BI_venta_autoparte venta
+	where venta.sucursal_id = suc.sucursal_id and month(venta.fecha) = t.mes) -
+(select sum(compra_precio*cantidad) from VARCHARIZARD.BI_compra_autoparte compra
+	where compra.sucursal_id = suc.sucursal_id and month(compra.fecha) = t.mes) ganancia
+from VARCHARIZARD.BI_sucursal suc, VARCHARIZARD.BI_tiempo t
+;
+
+go
+create view VARCHARIZARD.maximaCantidadStockPorSucursal as
+select suc.sucursal_id, t.anio, sum(cantidad) cantidad_compras
+from VARCHARIZARD.BI_compra_autoparte compra
+	join VARCHARIZARD.BI_tiempo t on compra.fecha = t.fecha
+	join VARCHARIZARD.BI_sucursal suc on compra.sucursal_id = suc.sucursal_id
+	group by suc.sucursal_id, t.anio
+;
+
+
 --La de promedio de tiempo en stock de cada autoparte NO hay que hacerla, según dijo un ayudante en el foro
 
-create view cantidadDeAutomoviles as
+-----------------------------------
+-- Vistas automóvil
+-----------------------------------
+go
+create view VARCHARIZARD.cantidadDeAutomoviles as
 select distinct suc.descripcion sucursal, t.mes,
 	(select count(*) 
 		from VARCHARIZARD.BI_venta_automovil venta 
@@ -29,13 +50,15 @@ select distinct suc.descripcion sucursal, t.mes,
 	from VARCHARIZARD.BI_sucursal suc, VARCHARIZARD.BI_tiempo t
 ;
 
-create view precioPromedioAutomoviles as
+go
+create view VARCHARIZARD.precioPromedioAutomoviles as
 select 
 (select sum(factura_precio)/count(*) from VARCHARIZARD.BI_venta_automovil) promedio_venta,
 (select sum(compra_precio)/count(*) from VARCHARIZARD.BI_compra_automovil) promedio_compra
 ;
 
-create view gananciaMensual as
+go
+create view VARCHARIZARD.gananciaMensualPorSucursal as
 select distinct suc.descripcion sucursal, t.mes,
 (select sum(factura_precio) from VARCHARIZARD.BI_venta_automovil venta
 	where venta.sucursal_id = suc.sucursal_id and month(venta.fecha) = t.mes) -
@@ -44,9 +67,15 @@ select distinct suc.descripcion sucursal, t.mes,
 from VARCHARIZARD.BI_sucursal suc, VARCHARIZARD.BI_tiempo t
 ;
 
---select datediff(day, compra.fecha, venta.fecha)
---select compra.fecha, venta.fecha, compra.modelo_id, venta.modelo_id
---from VARCHARIZARD.BI_venta_automovil venta, VARCHARIZARD.BI_compra_automovil compra
-	--join VARCHARIZARD.BI_compra_automovil compra on venta.modelo_id = compra.modelo_id
---where venta.modelo_id = compra.modelo_id
+go
+create view VARCHARIZARD.promedioTiempoStockAutomovil as
+select m.descripcion modelo, sum(datediff(day, compra.fecha, venta.fecha))/count(*) dias_stock_promedio
+from VARCHARIZARD.BI_venta_automovil venta, VARCHARIZARD.BI_compra_automovil compra
+	join VARCHARIZARD.BI_modelo m on compra.modelo_id = m.modelo_id
+where venta.automovil_id = compra.automovil_id
+group by m.descripcion
 ;
+
+go
+
+exec varcharizard.creacion_vistas;
