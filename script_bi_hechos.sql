@@ -1,5 +1,8 @@
 use GD2C2020;
 
+go
+create proc varcharizard.creacion_hechos as
+
 create function varcharizard.rango_potencia (@potencia int) returns int as
 begin
 	if @potencia < 50 begin return 0 end
@@ -125,6 +128,6 @@ from VARCHARIZARD.Compra_Autoparte comp
 	join VARCHARIZARD.Modelo m on aut.cod_modelo = m.modelo_id
 ;
 
+go
 
-
-
+exec varcharizard.creacion_hechos;

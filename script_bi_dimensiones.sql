@@ -1,5 +1,8 @@
 use GD2C2020;
 
+go
+create proc varcharizard.creacion_dimensiones as
+
 -- DIMENSION CLIENTE
 create table varcharizard.BI_cliente (
 	cliente_id int primary key,
@@ -95,3 +98,7 @@ create table varcharizard.BI_autoparte (
 )
 insert into VARCHARIZARD.BI_autoparte
 select autoparte_id, autoparte_descripcion from VARCHARIZARD.Autoparte;
+
+go
+
+exec varcharizard.creacion_dimensiones;

@@ -1,5 +1,6 @@
 use GD2C2020;
 
+go
 create proc varcharizard.creacion_vistas as
 
 -----------------------------------
