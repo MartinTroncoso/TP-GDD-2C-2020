@@ -6,6 +6,8 @@ create proc varcharizard.creacion_vistas as
 -----------------------------------
 -- Vistas autoparte
 -----------------------------------
+
+-- Precio promedio de cada autoparte, vendida y comprada.
 go
 create view VARCHARIZARD.precioPromedioAutoparte as
 select aut.id_autoparte autoparte_id, aut.descripcion autoparte_descripcion,
@@ -14,6 +16,7 @@ select aut.id_autoparte autoparte_id, aut.descripcion autoparte_descripcion,
 from VARCHARIZARD.BI_autoparte aut
 ;
 
+-- Ganancias (precio de venta – precio de compra) x Sucursal x mes
 go
 create view VARCHARIZARD.ganaciasSucursalPorMes as
 select distinct suc.descripcion sucursal, t.mes,
@@ -24,6 +27,7 @@ select distinct suc.descripcion sucursal, t.mes,
 from VARCHARIZARD.BI_sucursal suc, VARCHARIZARD.BI_tiempo t
 ;
 
+-- Promedio de tiempo en stock de cada autoparte
 go
 create view VARCHARIZARD.maximaCantidadStockPorSucursal as
 select suc.sucursal_id, t.anio, sum(cantidad) cantidad_compras
@@ -34,7 +38,7 @@ from VARCHARIZARD.BI_compra_autoparte compra
 ;
 
 
---La de promedio de tiempo en stock de cada autoparte NO hay que hacerla, según dijo un ayudante en el foro
+--La de promedio de tiempo en stock de cada autoparte NO se realizó según instrucción de la cátedra.
 
 -----------------------------------
 -- Vistas automóvil

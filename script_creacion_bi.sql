@@ -1,5 +1,9 @@
 use GD2C2020;
 
+----------------------------------------------
+-- Dimensiones
+----------------------------------------------
+
 go
 create proc varcharizard.creacion_dimensiones as begin
 
@@ -101,6 +105,7 @@ select autoparte_id, autoparte_descripcion from VARCHARIZARD.Autoparte;
 
 end
 
+-- Función para convertir el valor escalar de potencia en un valor definido dentro de un rango
 go
 create function varcharizard.rango_potencia (@potencia int) returns int as
 begin
@@ -113,6 +118,11 @@ end
 
 go
 create proc varcharizard.creacion_hechos as begin
+
+
+----------------------------------------------
+-- Tablas de hecho
+----------------------------------------------
 
 ----------------------------------------------
 -- venta automovil
@@ -236,9 +246,13 @@ go
 exec varcharizard.creacion_dimensiones;
 go
 exec varcharizard.creacion_hechos;
+
+
 -----------------------------------
 -- Vistas autoparte
 -----------------------------------
+
+--Precio promedio de cada autoparte, vendida y comprada.
 go
 create view VARCHARIZARD.precioPromedioAutoparte as
 select aut.id_autoparte autoparte_id, aut.descripcion autoparte_descripcion,
@@ -247,6 +261,7 @@ select aut.id_autoparte autoparte_id, aut.descripcion autoparte_descripcion,
 from VARCHARIZARD.BI_autoparte aut
 ;
 
+-- Ganancias (precio de venta – precio de compra) x Sucursal x mes
 go
 create view VARCHARIZARD.ganaciasSucursalPorMes as
 select distinct suc.descripcion sucursal, t.mes,
@@ -257,6 +272,7 @@ select distinct suc.descripcion sucursal, t.mes,
 from VARCHARIZARD.BI_sucursal suc, VARCHARIZARD.BI_tiempo t
 ;
 
+-- Promedio de tiempo en stock de cada autoparte
 go
 create view VARCHARIZARD.maximaCantidadStockPorSucursal as
 select suc.sucursal_id, t.anio, sum(cantidad) cantidad_compras
@@ -267,11 +283,13 @@ from VARCHARIZARD.BI_compra_autoparte compra
 ;
 
 
---La de promedio de tiempo en stock de cada autoparte NO hay que hacerla, según dijo un ayudante en el foro
+--La de promedio de tiempo en stock de cada autoparte NO se realizó según instrucción de la cátedra.
 
 -----------------------------------
 -- Vistas automóvil
 -----------------------------------
+
+--Cantidad de automóviles, vendidos y comprados x sucursal y mes
 go
 create view VARCHARIZARD.cantidadDeAutomoviles as
 select distinct suc.descripcion sucursal, t.mes,
@@ -284,6 +302,7 @@ select distinct suc.descripcion sucursal, t.mes,
 	from VARCHARIZARD.BI_sucursal suc, VARCHARIZARD.BI_tiempo t
 ;
 
+--Precio promedio de automóviles, vendidos y comprados.
 go
 create view VARCHARIZARD.precioPromedioAutomoviles as
 select 
@@ -291,6 +310,7 @@ select
 (select sum(compra_precio)/count(*) from VARCHARIZARD.BI_compra_automovil) promedio_compra
 ;
 
+--Ganancias (precio de venta – precio de compra) x Sucursal x mes
 go
 create view VARCHARIZARD.gananciaMensualPorSucursal as
 select distinct suc.descripcion sucursal, t.mes,
@@ -301,6 +321,7 @@ select distinct suc.descripcion sucursal, t.mes,
 from VARCHARIZARD.BI_sucursal suc, VARCHARIZARD.BI_tiempo t
 ;
 
+--Promedio de tiempo en stock de cada modelo de automóvil
 go
 create view VARCHARIZARD.promedioTiempoStockAutomovil as
 select m.descripcion modelo, sum(datediff(day, compra.fecha, venta.fecha))/count(*) dias_stock_promedio
